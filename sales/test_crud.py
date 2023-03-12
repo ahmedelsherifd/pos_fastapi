@@ -1,6 +1,17 @@
 from .crud import create_customer, create_product, create_order, get_customers, get_products
-from app.database import SessionLocal, Base, engine
+from app.database import Base
 from . import models
+
+from sqlalchemy import create_engine
+
+from sqlalchemy.orm import sessionmaker, DeclarativeBase
+
+SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
+# SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver/db"
+
+engine = create_engine(SQLALCHEMY_DATABASE_URL,
+                       connect_args={"check_same_thread": False})
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 def test_pos_create_order():
@@ -10,7 +21,9 @@ def test_pos_create_order():
 
     customer_input = {"name": "Ahmed ELsherif"}
 
-    create_customer(db, **customer_input)
+    customer = create_customer(db, **customer_input)
+
+    Base.metadata.drop_all(engine)
 
     product_1_input = {
         "name": "Iphone 6",
