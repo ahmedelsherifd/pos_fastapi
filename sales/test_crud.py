@@ -45,10 +45,14 @@ def test_pos_create_order(db):
         }, {
             "product": variant_2,
             "quantity": 1
-        }]
+        }],
+        "payment": {
+            "amount": 30
+        }
     }
 
     order = create_order(db, **order_input)
 
     assert order.id is not None
     assert order.total_price == 30
+    assert order.payment.amount == 30

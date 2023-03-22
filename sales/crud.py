@@ -1,4 +1,4 @@
-from .models import Customer, Product, ProductVariant, OrderItem, Order
+from .models import Customer, Product, ProductVariant, OrderItem, Order, Payement
 from sqlalchemy.orm import Session
 from sqlalchemy import select, func
 
@@ -31,18 +31,17 @@ def create_order(db: Session, **data):
                   subtotal_price=subtotal_price(item_data))
         for item_data in items_data
     ]
-    order = Order(**data, items=items)
+    payment_data = data.pop("payment")
+    payment = Payement(**payment_data)
+    order = Order(**data, items=items, payment=payment)
     db.add(order)
-
     db.commit()
-    db.refresh(order)
-
     sum_subtoal_price = db.query(func.sum(OrderItem.subtotal_price)).filter(
         OrderItem.order == order).scalar_subquery()
 
     order.total_price = sum_subtoal_price
-
     db.commit()
+
     db.refresh(order)
 
     return order

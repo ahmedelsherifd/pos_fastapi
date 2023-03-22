@@ -48,7 +48,7 @@ class Customer(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String, index=True)
 
-    orders: Mapped["Order"] = relationship("Order", back_populates="customer")
+    orders: Mapped["Order"] = relationship(back_populates="customer")
 
 
 class Order(Base):
@@ -57,13 +57,22 @@ class Order(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     customer_id: Mapped[int] = mapped_column(Integer,
                                              ForeignKey("customers.id"))
-    customer: Mapped["Customer"] = relationship("Customer",
-                                                back_populates="orders")
-    items: Mapped[list["OrderItem"]] = relationship("OrderItem",
-                                                    back_populates="order")
+    customer: Mapped["Customer"] = relationship(back_populates="orders")
+    items: Mapped[list["OrderItem"]] = relationship(back_populates="order")
     total_price: Mapped[Decimal] = mapped_column(DECIMAL(precision=10,
                                                          scale=2),
                                                  default=0)
+    payment: Mapped["Payement"] = relationship(back_populates="order")
+
+
+class Payement(Base):
+    __tablename__ = "payments"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    order_id: Mapped[int] = mapped_column(Integer, ForeignKey("orders.id"))
+    amount: Mapped[Decimal] = mapped_column(DECIMAL(precision=10, scale=2),
+                                            default=0)
+    order: Mapped["Order"] = relationship(back_populates="payment")
 
 
 class OrderItem(Base):
@@ -79,6 +88,5 @@ class OrderItem(Base):
                                                             scale=2),
                                                     default=0)
 
-    product: Mapped["ProductVariant"] = relationship("ProductVariant",
-                                                     back_populates="orders")
-    order: Mapped["Order"] = relationship("Order", back_populates="items")
+    product: Mapped["ProductVariant"] = relationship(back_populates="orders")
+    order: Mapped["Order"] = relationship(back_populates="items")
