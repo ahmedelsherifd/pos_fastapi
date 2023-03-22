@@ -33,17 +33,13 @@ def create_order(db: Session, **data):
     ]
     payment_data = data.pop("payment")
     payment = Payement(**payment_data)
-    order = Order(**data, items=items, payment=payment)
+    total_price = sum([item.subtotal_price for item in items])
+    order = Order(**data,
+                  items=items,
+                  payment=payment,
+                  total_price=total_price)
     db.add(order)
-    db.flush()
-    sum_subtoal_price = select(func.sum(OrderItem.subtotal_price)).filter(
-        OrderItem.order == order).scalar_subquery()
-
-    order.total_price = sum_subtoal_price
-    try:
-        db.commit()
-    except:
-        db.rollback()
+    db.commit()
     db.refresh(order)
     return order
 
@@ -54,8 +50,10 @@ def get_order(db: Session, id: int):
     return result
 
 
-def get_customers(db: Session):
+def get_customers(db: Session, search: str = None):
     stmt = select(Customer)
+    if search:
+        stmt = stmt.where(Customer.name.contains(search))
     result = db.scalars(stmt).all()
     return result
 

@@ -10,7 +10,6 @@ def test_pos_create_order(db):
     customer_input = {"name": "Ahmed ELsherif"}
 
     customer = create_customer(db, **customer_input)
-    assert customer.id == 1
 
     product_1_input = {
         "name": "Iphone 6",
@@ -56,3 +55,14 @@ def test_pos_create_order(db):
     assert order.id is not None
     assert order.total_price == 30
     assert order.payment.amount == 30
+
+
+def test_search_customer_by_name(db):
+    customer_input = {"name": "Khalaf Eldahsoury Khalaf"}
+    create_customer(db, **customer_input)
+    customer_input = {"name": "Reda Elmesery"}
+    create_customer(db, **customer_input)
+
+    customers = get_customers(db, search="Reda")
+
+    assert customers[0].name == "Reda Elmesery"
