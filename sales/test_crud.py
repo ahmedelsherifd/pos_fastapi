@@ -1,29 +1,16 @@
-from .crud import create_customer, create_product, create_order, get_customers, get_products
-from app.database import Base
+from .crud import create_customer, create_product, create_order, get_customers, get_variants
+from app.database import Base, SessionLocal, engine
 from . import models
-
-from sqlalchemy import create_engine
-
-from sqlalchemy.orm import sessionmaker, DeclarativeBase
-
-SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
-# SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver/db"
-
-engine = create_engine(SQLALCHEMY_DATABASE_URL,
-                       connect_args={"check_same_thread": False})
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+import pytest
 
 
-def test_pos_create_order():
+def test_pos_create_order(db):
     # setup
-    Base.metadata.create_all(engine)
-    db = SessionLocal()
 
     customer_input = {"name": "Ahmed ELsherif"}
 
     customer = create_customer(db, **customer_input)
-
-    Base.metadata.drop_all(engine)
+    assert customer.id == 1
 
     product_1_input = {
         "name": "Iphone 6",
@@ -40,25 +27,28 @@ def test_pos_create_order():
         }]
     }
 
-    create_product(**product_1_input)
-    create_product(**product_2_input)
+    create_product(db, **product_1_input)
+    create_product(db, **product_2_input)
     # test crud functions that should work in POS
-    customer = get_customers().first()
-    products = get_products()
+    customer = get_customers(db)[0]
+    varinats = get_variants(db)
 
-    product_1 = products[0]
-    product_2 = products[1]
+    variant_1 = varinats[0]
+    variant_2 = varinats[1]
 
     order_input = {
-        "customer": customer,
+        "customer":
+        customer,
         "items": [{
-            "product": product_1
+            "product": variant_1,
+            "quantity": 1
         }, {
-            "product": product_2
+            "product": variant_2,
+            "quantity": 1
         }]
     }
 
-    order = create_order(**order_input)
+    order = create_order(db, **order_input)
 
     assert order.id is not None
     assert order.total_price == 20
