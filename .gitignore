@@ -19,7 +19,8 @@ docs_build
 venv
 docs.zip
 archive.zip
-.db
+*.db
+*.sqlite3
 # vim temporary files
 *~
 .*.sw?
