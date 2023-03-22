@@ -36,7 +36,7 @@ def create_order(db: Session, **data):
     order = Order(**data, items=items, payment=payment)
     db.add(order)
     db.flush()
-    sum_subtoal_price = db.query(func.sum(OrderItem.subtotal_price)).filter(
+    sum_subtoal_price = select(func.sum(OrderItem.subtotal_price)).filter(
         OrderItem.order == order).scalar_subquery()
 
     order.total_price = sum_subtoal_price
