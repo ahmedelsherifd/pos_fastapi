@@ -36,12 +36,13 @@ def create_order(db: Session, **data):
 
     db.commit()
 
-    sum_subtoal_price = db.query(func.sum(OrderItem.subtotal_price))
+    sum_subtoal_price = db.query(func.sum(
+        OrderItem.subtotal_price)).scalar_subquery()
     order.total_price = sum_subtoal_price
 
     db.commit()
     db.refresh(order)
-    breakpoint()
+
     return order
 
 

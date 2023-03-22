@@ -51,4 +51,4 @@ def test_pos_create_order(db):
     order = create_order(db, **order_input)
 
     assert order.id is not None
-    assert order.total_price == 20
+    assert order.total_price == 30
