@@ -1,4 +1,4 @@
-from .crud import create_customer, create_product, create_order, get_customers, get_variants
+from .crud import create_customer, create_product, create_order, get_customers, get_variants, get_order
 from app.database import Base, SessionLocal, engine
 from . import models
 import pytest
