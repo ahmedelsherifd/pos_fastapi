@@ -20,7 +20,7 @@ class ProductVariant(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String, index=True)
     price: Mapped[Decimal] = mapped_column(DECIMAL(precision=10, scale=2))
-    # sku: Mapped[int] = mapped_column(Integer)
+    SKU: Mapped[str] = mapped_column(String, nullable=True)
     product_id: Mapped[int] = mapped_column(Integer, ForeignKey("products.id"))
 
     product: Mapped["Product"] = relationship("Product",

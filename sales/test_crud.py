@@ -66,3 +66,27 @@ def test_search_customer_by_name(db):
     customers = get_customers(db, search="Reda")
 
     assert customers[0].name == "Reda Elmesery"
+
+
+def test_search_product_by_sku(db):
+    product_1_input = {
+        "name": "Iphone 6",
+        "variants": [{
+            "price": 10,
+            "name": "Iphone 6 128GB",
+            "SKU": "4578"
+        }]
+    }
+    product_2_input = {
+        "name": "Iphone 12",
+        "variants": [{
+            "price": 20,
+            "name": "Iphone 12 128GB",
+            "SKU": "4589"
+        }]
+    }
+    create_product(db, **product_1_input)
+    create_product(db, **product_2_input)
+
+    products = get_variants(db, search="458")
+    assert products[0].name == "Iphone 12 128GB"

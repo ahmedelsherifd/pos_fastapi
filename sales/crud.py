@@ -58,7 +58,9 @@ def get_customers(db: Session, search: str = None):
     return result
 
 
-def get_variants(db: Session):
+def get_variants(db: Session, search: str = None):
     stmt = select(ProductVariant)
+    if search:
+        stmt = stmt.where(ProductVariant.SKU.startswith(search))
     result = db.scalars(stmt).all()
     return result
