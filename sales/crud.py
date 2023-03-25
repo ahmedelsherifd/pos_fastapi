@@ -1,6 +1,7 @@
-from .models import Customer, Product, ProductVariant, OrderItem, Order, Payement
+from .models import Customer, Product, ProductVariant, OrderItem, Order, Payement, Category
 from sqlalchemy.orm import Session
 from sqlalchemy import select, func
+from sqlalchemy.orm import joinedload
 
 
 def create_customer(db: Session, **data):
@@ -23,6 +24,7 @@ def create_product(db: Session, **data):
 
 def create_order(db: Session, **data):
     items_data = data.pop("items", [])
+
     unit_price = lambda item: item['product'].price
     subtotal_price = lambda item: item['quantity'] * unit_price(item)
     items = [
@@ -58,9 +60,20 @@ def get_customers(db: Session, search: str = None):
     return result
 
 
-def get_variants(db: Session, search: str = None):
+def get_variants(db: Session, search: str = None, category: int = None):
     stmt = select(ProductVariant)
+
+    if category:
+        stmt = stmt.join(
+            ProductVariant.product).where(Product.category_id == category)
     if search:
         stmt = stmt.where(ProductVariant.SKU.startswith(search))
     result = db.scalars(stmt).all()
     return result
+
+
+def create_category(db: Session, **data):
+    category = Category(**data)
+    db.add(category)
+    db.commit()
+    return category

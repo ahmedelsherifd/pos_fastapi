@@ -1,4 +1,4 @@
-from .crud import create_customer, create_product, create_order, get_customers, get_variants, get_order
+from .crud import create_customer, create_product, create_order, get_customers, get_variants, get_order, create_category
 from app.database import Base, SessionLocal, engine
 from . import models
 import pytest
@@ -90,3 +90,33 @@ def test_search_product_by_sku(db):
 
     products = get_variants(db, search="458")
     assert products[0].name == "Iphone 12 128GB"
+
+
+def test_filter_product_by_catgory(db):
+    cars_cat = create_category(db, name="Cars")
+    phones_cat = create_category(db, name="Phones")
+
+    product_1_input = {
+        "name": "Honda CRV 2023",
+        "category": cars_cat,
+        "variants": [{
+            "price": 100,
+            "name": "Honda CRV 2023 Grey",
+            "SKU": "4578"
+        }]
+    }
+    product_2_input = {
+        "name": "Iphone 12",
+        "category": phones_cat,
+        "variants": [{
+            "price": 20,
+            "name": "Iphone 12 128GB",
+            "SKU": "4589"
+        }]
+    }
+    create_product(db, **product_1_input)
+    create_product(db, **product_2_input)
+
+    products = get_variants(db, category=phones_cat.id)
+    assert products[0].name == "Iphone 12 128GB"
+    assert len(products) == 1
