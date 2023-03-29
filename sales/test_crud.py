@@ -5,6 +5,8 @@ from .crud import (create_category, create_customer, create_order,
                    create_product, get_customers, get_order,
                    get_sales_by_items, get_variants, get_total_payments_node)
 
+from datetime import datetime
+
 
 def test_pos_create_order(db):
     # setup
@@ -214,7 +216,8 @@ def test_total_payments(db):
             "quantity": 1
         }],
         "payment": {
-            "amount": 30
+            "amount": 30,
+            "created_at": datetime(2023, 3, 28)
         }
     }
 
@@ -225,10 +228,19 @@ def test_total_payments(db):
             "quantity": 10
         }],
         "payment": {
-            "amount": 100
+            "amount": 100,
+            "created_at": datetime(2023, 3, 29)
         }
     }
 
     create_order(db, **order_input)
+
     total_payments = get_total_payments_node(db)
     assert total_payments == 130
+
+    start_date = datetime(2023, 3, 29)
+    end_date = datetime(2023, 3, 29)
+    total_payments = get_total_payments_node(db,
+                                             start_date=start_date,
+                                             end_date=end_date)
+    assert total_payments == 100

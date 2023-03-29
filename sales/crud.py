@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select, func
 from sqlalchemy.orm import joinedload
 from app.database import engine
+from datetime import datetime
 
 
 def create_customer(db: Session, **data):
@@ -92,8 +93,15 @@ def get_sales_by_items(db: Session):
     return result
 
 
-def get_total_payments_node(db: Session):
+def get_total_payments_node(db: Session,
+                            start_date: datetime = None,
+                            end_date: datetime = None):
     stmt = select(func.sum(Payement.amount))
+    if start_date:
+        stmt = stmt.filter(Payement.created_at >= start_date)
+    if end_date:
+        stmt = stmt.filter(Payement.created_at <= end_date)
+
     result = db.execute(stmt)
 
     return result.scalar()
