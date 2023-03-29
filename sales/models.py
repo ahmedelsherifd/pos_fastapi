@@ -1,6 +1,9 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DECIMAL
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from datetime import datetime
 from decimal import Decimal
+
+from sqlalchemy import (DECIMAL, Boolean, Column, DateTime, ForeignKey,
+                        Integer, String, func)
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
 
@@ -84,6 +87,8 @@ class Payement(Base):
     order_id: Mapped[int] = mapped_column(ForeignKey("orders.id"))
     amount: Mapped[Decimal] = mapped_column(DECIMAL(precision=10, scale=2),
                                             default=0)
+    created_at: Mapped[datetime] = Column(DateTime(timezone=True),
+                                          server_default=func.now())
     order: Mapped["Order"] = relationship(back_populates="payment")
 
 

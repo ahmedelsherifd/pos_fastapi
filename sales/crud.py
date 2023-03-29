@@ -90,3 +90,10 @@ def get_sales_by_items(db: Session):
     result = db.execute(stmt).all()
 
     return result
+
+
+def get_total_payments_node(db: Session):
+    stmt = select(func.sum(Payement.amount))
+    result = db.execute(stmt)
+
+    return result.scalar()
