@@ -105,5 +105,7 @@ class OrderItem(Base):
                                                             scale=2),
                                                     default=0)
 
+    created_at: Mapped[datetime] = Column(DateTime(timezone=True),
+                                          server_default=func.now())
     product: Mapped["ProductVariant"] = relationship(back_populates="orders")
     order: Mapped["Order"] = relationship(back_populates="items")

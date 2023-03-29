@@ -20,7 +20,7 @@ def test_pos_create_order(db):
         "name": "Iphone 6",
         "variants": [{
             "price": 10,
-            "name": "Iphone 12 128GB",
+            "name": "Iphone 6 128GB",
         }]
     }
     product_2_input = {
@@ -132,7 +132,7 @@ def test_sales_by_items(db):
         "name": "Iphone 6",
         "variants": [{
             "price": 10,
-            "name": "Iphone 12 128GB",
+            "name": "Iphone 6 128GB",
         }]
     }
     product_2_input = {
@@ -154,10 +154,12 @@ def test_sales_by_items(db):
     order_input = {
         "items": [{
             "product": variant_1,
-            "quantity": 1
+            "quantity": 1,
+            "created_at": datetime(2023, 3, 28)
         }, {
             "product": variant_2,
-            "quantity": 1
+            "quantity": 1,
+            "created_at": datetime(2023, 3, 28)
         }],
         "payment": {
             "amount": 30
@@ -169,7 +171,8 @@ def test_sales_by_items(db):
     order_input = {
         "items": [{
             "product": variant_1,
-            "quantity": 10
+            "quantity": 10,
+            "created_at": datetime(2023, 3, 29)
         }],
         "payment": {
             "amount": 100
@@ -182,9 +185,33 @@ def test_sales_by_items(db):
 
     item_1 = sales_by_item[0]
 
-    assert item_1.ProductVariant.name == "Iphone 12 128GB"
+    assert item_1.ProductVariant.name == "Iphone 6 128GB"
     assert item_1.total_sales == 110
     assert item_1.total_quantity == 11
+
+    order_input = {
+        "items": [{
+            "product": variant_1,
+            "quantity": 5,
+            "created_at": datetime(2023, 3, 29)
+        }],
+        "payment": {
+            "amount": 50
+        }
+    }
+
+    create_order(db, **order_input)
+
+    start_date = datetime(2023, 3, 29)
+    end_date = datetime(2023, 3, 29)
+    sales_by_items = get_sales_by_items(db,
+                                       start_date=start_date,
+                                       end_date=end_date)
+
+    item_1 = sales_by_items[0]
+    assert item_1.ProductVariant.name == "Iphone 6 128GB"
+    assert item_1.total_sales == 150
+    assert item_1.total_quantity == 15
 
 
 def test_total_payments_node(db):

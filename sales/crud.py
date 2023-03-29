@@ -81,12 +81,20 @@ def create_category(db: Session, **data):
     return category
 
 
-def get_sales_by_items(db: Session):
+def get_sales_by_items(db: Session,
+                       start_date: datetime = None,
+                       end_date: datetime = None):
     stmt = select(ProductVariant,
                   func.sum(OrderItem.quantity).label("total_quantity"),
                   func.sum(
                       OrderItem.subtotal_price).label("total_sales")).join(
-                          ProductVariant.orders).group_by(OrderItem.product_id)
+                          ProductVariant.orders)
+    if start_date:
+        stmt = stmt.filter(OrderItem.created_at >= start_date)
+    if end_date:
+        stmt = stmt.filter(OrderItem.created_at <= end_date)
+
+    stmt = stmt.group_by(OrderItem.product_id)
 
     result = db.execute(stmt).all()
 
