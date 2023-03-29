@@ -12,9 +12,8 @@ def db():
 
 
 @pytest.fixture(autouse=True)
-def create_tables(db, request):
-    from app.database import Base, engine, SessionLocal
-
+def database_setup_teardown(db, request):
+    from app.database import Base, engine
     Base.metadata.create_all(engine)
 
     def drop_tables():

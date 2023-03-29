@@ -2,6 +2,7 @@ from .models import Customer, Product, ProductVariant, OrderItem, Order, Payemen
 from sqlalchemy.orm import Session
 from sqlalchemy import select, func
 from sqlalchemy.orm import joinedload
+from app.database import engine
 
 
 def create_customer(db: Session, **data):
@@ -77,3 +78,15 @@ def create_category(db: Session, **data):
     db.add(category)
     db.commit()
     return category
+
+
+def get_sales_by_items(db: Session):
+    stmt = select(ProductVariant,
+                  func.sum(OrderItem.quantity).label("total_quantity"),
+                  func.sum(
+                      OrderItem.subtotal_price).label("total_sales")).join(
+                          ProductVariant.orders).group_by(OrderItem.product_id)
+
+    result = db.execute(stmt).all()
+
+    return result

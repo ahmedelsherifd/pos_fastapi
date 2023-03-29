@@ -1,7 +1,9 @@
-from .crud import create_customer, create_product, create_order, get_customers, get_variants, get_order, create_category
-from app.database import Base, SessionLocal, engine
-from . import models
 import pytest
+
+from . import models
+from .crud import (create_category, create_customer, create_order,
+                   create_product, get_customers, get_order,
+                   get_sales_by_items, get_variants)
 
 
 def test_pos_create_order(db):
@@ -120,3 +122,63 @@ def test_filter_product_by_catgory(db):
     products = get_variants(db, category=phones_cat.id)
     assert products[0].name == "Iphone 12 128GB"
     assert len(products) == 1
+
+
+def test_sales_by_items(db):
+    product_1_input = {
+        "name": "Iphone 6",
+        "variants": [{
+            "price": 10,
+            "name": "Iphone 12 128GB",
+        }]
+    }
+    product_2_input = {
+        "name": "Iphone 12",
+        "variants": [{
+            "price": 20,
+            "name": "Iphone 12 128GB",
+        }]
+    }
+
+    create_product(db, **product_1_input)
+    create_product(db, **product_2_input)
+
+    varinats = get_variants(db)
+
+    variant_1 = varinats[0]
+    variant_2 = varinats[1]
+
+    order_input = {
+        "items": [{
+            "product": variant_1,
+            "quantity": 1
+        }, {
+            "product": variant_2,
+            "quantity": 1
+        }],
+        "payment": {
+            "amount": 30
+        }
+    }
+
+    create_order(db, **order_input)
+
+    order_input = {
+        "items": [{
+            "product": variant_1,
+            "quantity": 10
+        }],
+        "payment": {
+            "amount": 100
+        }
+    }
+
+    create_order(db, **order_input)
+
+    sales_by_item = get_sales_by_items(db)
+
+    item_1 = sales_by_item[0]
+
+    assert item_1.ProductVariant.name == "Iphone 12 128GB"
+    assert item_1.total_sales == 110
+    assert item_1.total_quantity == 11
