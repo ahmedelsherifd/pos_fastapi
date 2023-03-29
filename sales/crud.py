@@ -102,6 +102,24 @@ def get_total_payments_node(db: Session,
     if end_date:
         stmt = stmt.filter(Payement.created_at <= end_date)
 
-    result = db.execute(stmt)
+    result = db.execute(stmt).scalar()
 
-    return result.scalar()
+    return result
+
+
+def get_total_payments(db: Session,
+                       start_date: datetime = None,
+                       end_date: datetime = None):
+    stmt = select(
+        func.date(Payement.created_at).label("date"),
+        func.sum(Payement.amount).label("total_payments")).group_by(
+            func.date(Payement.created_at))
+
+    if start_date:
+        stmt = stmt.filter(Payement.created_at >= start_date)
+    if end_date:
+        stmt = stmt.filter(Payement.created_at <= end_date)
+
+    result = db.execute(stmt).all()
+
+    return result

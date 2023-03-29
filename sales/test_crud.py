@@ -3,7 +3,8 @@ import pytest
 from . import models
 from .crud import (create_category, create_customer, create_order,
                    create_product, get_customers, get_order,
-                   get_sales_by_items, get_variants, get_total_payments_node)
+                   get_sales_by_items, get_variants, get_total_payments_node,
+                   get_total_payments)
 
 from datetime import datetime
 
@@ -186,7 +187,7 @@ def test_sales_by_items(db):
     assert item_1.total_quantity == 11
 
 
-def test_total_payments(db):
+def test_total_payments_node(db):
     product_1_input = {
         "name": "Iphone 6",
         "variants": [{
@@ -244,3 +245,63 @@ def test_total_payments(db):
                                              start_date=start_date,
                                              end_date=end_date)
     assert total_payments == 100
+
+
+def test_total_payments_by_day(db):
+    product_1_input = {
+        "name": "Iphone 6",
+        "variants": [{
+            "price": 10,
+            "name": "Iphone 12 128GB",
+        }]
+    }
+    product_2_input = {
+        "name": "Iphone 12",
+        "variants": [{
+            "price": 20,
+            "name": "Iphone 12 128GB",
+        }]
+    }
+
+    create_product(db, **product_1_input)
+    create_product(db, **product_2_input)
+
+    varinats = get_variants(db)
+
+    variant_1 = varinats[0]
+    variant_2 = varinats[1]
+
+    order_input = {
+        "items": [{
+            "product": variant_1,
+            "quantity": 1
+        }],
+        "payment": {
+            "amount": 30,
+            "created_at": datetime(2023, 3, 28)
+        }
+    }
+
+    create_order(db, **order_input)
+    order_input = {
+        "items": [{
+            "product": variant_1,
+            "quantity": 10
+        }],
+        "payment": {
+            "amount": 100,
+            "created_at": datetime(2023, 3, 29)
+        }
+    }
+
+    create_order(db, **order_input)
+
+    total_payments = get_total_payments(db)
+    day_28 = total_payments[0]
+    day_29 = total_payments[1]
+
+    #assert day_28.date == datetime(2023, 3, 28)
+    assert day_28.total_payments == 30
+
+    # assert day_29.date == datetime(2023, 3, 29)
+    assert day_29.total_payments == 100
