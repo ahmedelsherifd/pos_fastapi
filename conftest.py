@@ -1,5 +1,4 @@
 from os import environ
-from sqlalchemy.orm import Session
 import pytest
 
 environ["TESTING"] = str(True)
@@ -7,13 +6,12 @@ environ["TESTING"] = str(True)
 
 @pytest.fixture
 def db(request):
-    from app.database import Base, engine
-    Base.metadata.create_all(engine)
+    from app.database import engine, SessionLocal
 
     connection = engine.connect()
     transaction = connection.begin()
 
-    db = Session(bind=connection)
+    db = SessionLocal(bind=connection)
 
     def roll_back():
         db.close()
@@ -24,15 +22,12 @@ def db(request):
     return db
 
 
-# @pytest.fixture(autouse=True)
-# def database_setup_teardown(db: Session, request):
-#     from app.database import Base, engine
-#     Base.metadata.create_all(engine)
+@pytest.fixture(scope="session", autouse=True)
+def database_setup(request):
+    from app.database import Base, engine
+    Base.metadata.create_all(engine)
 
-#     def drop_tables():
-#         # Base.metadata.drop_all(engine)
-#         # roll back
-#         db.rollback()
-#         pass
+    def drop_tables():
+        Base.metadata.drop_all(engine)
 
-#     request.addfinalizer(drop_tables)
+    request.addfinalizer(drop_tables)
