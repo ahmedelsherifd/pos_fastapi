@@ -117,7 +117,6 @@ def test_total_payments(db):
 
 
 def test_total_payments_daily(db):
-
     load_data(db)
 
     total_payments = get_total_payments(db)
