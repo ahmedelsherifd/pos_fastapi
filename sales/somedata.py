@@ -27,6 +27,7 @@ def create_category_2(db):
 
 
 def create_product_1(db):
+
     category = get_categories(db, search="Cars")[0]
     data = {
         "name": "Honda CRV 2023",
@@ -106,3 +107,7 @@ def load_data(db: Session):
 
     create_order_1(db)
     create_order_2(db)
+
+    # don't use product_2 used in test_sales_by_items - order
+    # don't use mar_29 as created_at in order.items used in test_sales_by_items - order
+    # don't use mar_29 or mar_28 used in test_total_payments - payment

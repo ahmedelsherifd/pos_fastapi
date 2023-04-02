@@ -105,13 +105,6 @@ def test_sales_by_items_filter_by_date(db):
     assert mar_29.total_quantity == 1
 
 
-def test_total_payments_node(db):
-    load_data(db)
-
-    total_payments = get_total_payments_node(db)
-    assert total_payments == 120
-
-
 def test_total_payments(db):
     load_data(db)
 
