@@ -4,6 +4,7 @@ from sqlalchemy import select, func
 from sqlalchemy.orm import joinedload
 from app.database import engine
 from datetime import datetime
+from sqlalchemy import or_
 
 
 def create_customer(db: Session, **data):
@@ -69,7 +70,10 @@ def get_variants(db: Session, search: str = None, category: int = None):
         stmt = stmt.join(
             ProductVariant.product).where(Product.category_id == category)
     if search:
-        stmt = stmt.where(ProductVariant.SKU.startswith(search))
+        stmt = stmt.where(
+            or_(ProductVariant.SKU.startswith(search),
+                ProductVariant.name.contains(search)))
+
     result = db.scalars(stmt).all()
     return result
 
@@ -81,7 +85,16 @@ def create_category(db: Session, **data):
     return category
 
 
+def get_categories(db: Session, search: str = None):
+    stmt = select(Category)
+    if search:
+        stmt = stmt.where(Category.name.contains(search))
+    result = db.scalars(stmt).all()
+    return result
+
+
 def get_sales_by_items(db: Session,
+                       search: str = None,
                        start_date: datetime = None,
                        end_date: datetime = None):
     stmt = select(ProductVariant,
@@ -93,6 +106,9 @@ def get_sales_by_items(db: Session,
         stmt = stmt.filter(OrderItem.created_at >= start_date)
     if end_date:
         stmt = stmt.filter(OrderItem.created_at <= end_date)
+
+    if search:
+        stmt = stmt.where(ProductVariant.name.contains(search))
 
     stmt = stmt.group_by(OrderItem.product_id)
 
