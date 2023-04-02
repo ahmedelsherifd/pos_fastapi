@@ -123,6 +123,6 @@ def test_total_payments_daily(db):
     total_payments = get_total_payments(db)
     mar_28 = total_payments[0]
     mar_29 = total_payments[1]
-
+    assert mar_28.date == "2023-03-28"
     assert mar_28.total_payments == 100
     assert mar_29.total_payments == 20
