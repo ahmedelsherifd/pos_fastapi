@@ -74,3 +74,9 @@ def get_variants(db: Session = Depends(get_db)):
 def get_customers(db: Session = Depends(get_db)):
     data = crud.get_customers(db)
     return data
+
+
+@app.get("/sales-by-items/", response_model=list[schemas.SaleByItem])
+def get_sales_by_items(db: Session = Depends(get_db)):
+    data = crud.get_sales_by_items(db)
+    return data

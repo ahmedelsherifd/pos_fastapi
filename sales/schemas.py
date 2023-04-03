@@ -79,6 +79,15 @@ class Product(BaseModel):
         orm_mode = True
 
 
+class SaleByItem(BaseModel):
+    date: str
+    total_sales: Decimal
+    total_quantity: int
+
+    class Config:
+        orm_mode = True
+
+
 class OrderItem(BaseModel):
     id: int
     product: ProductVariant

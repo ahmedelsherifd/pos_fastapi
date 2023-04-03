@@ -55,3 +55,8 @@ def test_get_categories(db, client: TestClient):
 def test_get_customers(db, client: TestClient):
     response = client.get("/customers/")
     assert response.status_code == 200
+
+
+def test_get_sales_by_items(db, client: TestClient):
+    response = client.get("/sales-by-items/")
+    assert response.status_code == 200
