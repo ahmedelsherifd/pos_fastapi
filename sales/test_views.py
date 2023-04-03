@@ -88,3 +88,9 @@ def test_get_order(db, client: TestClient):
     load_data(db)
     response = client.get("/orders/1/")
     assert response.status_code == 200
+
+
+def test_total_payments_node(db, client: TestClient):
+    load_data(db)
+    response = client.get("/total-payments/node/")
+    assert response.status_code == 200

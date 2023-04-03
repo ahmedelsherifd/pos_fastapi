@@ -11,6 +11,7 @@ from sales import crud, schemas
 
 from . import models
 from .database import SessionLocal, engine
+from decimal import Decimal
 
 middleware = [
     Middleware(RawContextMiddleware,
@@ -110,4 +111,10 @@ def get_customer(pk: int, db: Session = Depends(get_db)):
 @app.get("/orders/{pk}/", response_model=schemas.Order)
 def get_order(pk: int, db: Session = Depends(get_db)):
     instance = get_object_or_404(db, crud.get_order, pk)
+    return instance
+
+
+@app.get("/total-payments/node/", response_model=Decimal)
+def get_total_payments_node(db: Session = Depends(get_db)):
+    instance = crud.get_total_payments_node(db)
     return instance
