@@ -102,6 +102,12 @@ def get_product(pk: int, db: Session = Depends(get_db)):
 
 
 @app.get("/customers/{pk}/", response_model=schemas.Customer)
-def get_product(pk: int, db: Session = Depends(get_db)):
+def get_customer(pk: int, db: Session = Depends(get_db)):
     instance = get_object_or_404(db, crud.get_customer, pk)
+    return instance
+
+
+@app.get("/orders/{pk}/", response_model=schemas.Order)
+def get_order(pk: int, db: Session = Depends(get_db)):
+    instance = get_object_or_404(db, crud.get_order, pk)
     return instance

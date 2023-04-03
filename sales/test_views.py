@@ -82,3 +82,9 @@ def test_get_customer(db, client: TestClient):
     load_data(db)
     response = client.get("/customers/1/")
     assert response.status_code == 200
+
+
+def test_get_order(db, client: TestClient):
+    load_data(db)
+    response = client.get("/orders/1/")
+    assert response.status_code == 200
