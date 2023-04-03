@@ -35,3 +35,8 @@ def test_create_product(db, client: TestClient):
                                }]
                            })
     assert response.status_code == 200
+
+
+def test_create_category(db, client: TestClient):
+    response = client.post("/categories/", json={"name": "Phones"})
+    assert response.status_code == 200

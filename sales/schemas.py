@@ -12,7 +12,7 @@ class CustomerInput(BaseModel):
 
 
 class CategoryInput(BaseModel):
-    ...
+    name: str
 
 
 class ProductVariantInput(BaseModel):
@@ -55,12 +55,17 @@ class Customer(BaseModel):
 
 
 class Category(BaseModel):
-    ...
+    id: int
+    name: str
+
+    class Config:
+        orm_mode = True
 
 
 class ProductVariant(BaseModel):
     id: int
     name: str
+    price: Decimal
 
     class Config:
         orm_mode = True
