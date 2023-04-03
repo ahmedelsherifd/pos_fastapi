@@ -80,3 +80,9 @@ def get_customers(db: Session = Depends(get_db)):
 def get_sales_by_items(db: Session = Depends(get_db)):
     data = crud.get_sales_by_items(db)
     return data
+
+
+@app.get("/total-payments/", response_model=list[schemas.TotalPayment])
+def get_total_payments(db: Session = Depends(get_db)):
+    data = crud.get_total_payments(db)
+    return data

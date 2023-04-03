@@ -104,3 +104,11 @@ class Order(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class TotalPayment(BaseModel):
+    date: str
+    total_payments: Decimal
+
+    class Config:
+        orm_mode = True

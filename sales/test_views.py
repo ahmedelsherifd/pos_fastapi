@@ -64,3 +64,9 @@ def test_get_sales_by_items(db, client: TestClient):
     load_data(db)
     response = client.get("/sales-by-items/")
     assert response.status_code == 200
+
+
+def test_total_payments_daily(db, client: TestClient):
+    load_data(db)
+    response = client.get("/total-payments/")
+    assert response.status_code == 200
