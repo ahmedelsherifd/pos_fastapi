@@ -70,3 +70,9 @@ def test_total_payments_daily(db, client: TestClient):
     load_data(db)
     response = client.get("/total-payments/")
     assert response.status_code == 200
+
+
+def test_get_product(db, client: TestClient):
+    load_data(db)
+    response = client.get("/products/1/")
+    assert response.status_code == 200

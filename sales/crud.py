@@ -49,6 +49,12 @@ def create_order(db: Session, **data):
     return order
 
 
+def get_product(db: Session, pk: int):
+    stmt = select(Product).where(Product.id == pk)
+    result = db.scalars(stmt).one()
+    return result
+
+
 def get_order(db: Session, id: int):
     stmt = select(Order).where(Order.id == id)
     result = db.scalars(stmt).one()

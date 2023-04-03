@@ -21,6 +21,13 @@ middleware = [
 app = FastAPI(middleware=middleware)
 
 
+def get_object_or_404(db, get, pk):
+    try:
+        return get(db, pk)
+    except:
+        raise HTTPException(status_code=404, detail="object not found")
+
+
 # Dependency
 def get_db():
     db = SessionLocal()
@@ -86,3 +93,9 @@ def get_sales_by_items(db: Session = Depends(get_db)):
 def get_total_payments(db: Session = Depends(get_db)):
     data = crud.get_total_payments(db)
     return data
+
+
+@app.get("/products/{pk}/", response_model=schemas.Product)
+def get_product(pk: int, db: Session = Depends(get_db)):
+    instance = get_object_or_404(db, crud.get_product, pk)
+    return instance
