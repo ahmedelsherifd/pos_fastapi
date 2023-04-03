@@ -37,8 +37,15 @@ def get_variants(db: Session = Depends(get_db)):
     return variants
 
 
-@app.post("/orders/")
-def create_order(order: schemas.OrderInput, db: Session = Depends(get_db)):
+@app.post("/orders/", response_model=schemas.Order)
+def create_order(data: schemas.OrderInput, db: Session = Depends(get_db)):
 
-    instance = crud.create_order(db, **order.dict())
-    return {}
+    instance = crud.create_order(db, **data.dict())
+    return instance
+
+
+@app.post("/customers/", response_model=schemas.Customer)
+def create_customer(data: schemas.CustomerInput,
+                    db: Session = Depends(get_db)):
+    instance = crud.create_customer(db, **data.dict())
+    return instance

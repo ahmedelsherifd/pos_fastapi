@@ -17,3 +17,8 @@ def test_create_order(db, client: TestClient):
                                }
                            })
     assert response.status_code == 200
+
+
+def test_create_customer(db, client: TestClient):
+    response = client.post("/customers/", json={"name": "Ahmed ELsherif"})
+    assert response.status_code == 200

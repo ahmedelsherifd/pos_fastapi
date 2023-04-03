@@ -1,6 +1,7 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, select
+from sqlalchemy.orm import DeclarativeBase, sessionmaker
+from starlette_context import context
 
-from sqlalchemy.orm import sessionmaker, DeclarativeBase
 from .settings import Settings
 
 settings = Settings()
@@ -16,4 +17,10 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 class Base(DeclarativeBase):
-    pass
+
+    @classmethod
+    def from_id(cls, id: int):
+        db = context["db"]
+        stmt = select(cls).where(cls.id == id)
+        result = db.scalar(stmt)
+        return result
