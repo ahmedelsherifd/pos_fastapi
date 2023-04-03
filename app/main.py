@@ -99,3 +99,9 @@ def get_total_payments(db: Session = Depends(get_db)):
 def get_product(pk: int, db: Session = Depends(get_db)):
     instance = get_object_or_404(db, crud.get_product, pk)
     return instance
+
+
+@app.get("/customers/{pk}/", response_model=schemas.Customer)
+def get_product(pk: int, db: Session = Depends(get_db)):
+    instance = get_object_or_404(db, crud.get_customer, pk)
+    return instance

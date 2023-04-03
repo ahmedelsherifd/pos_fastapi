@@ -55,6 +55,12 @@ def get_product(db: Session, pk: int):
     return result
 
 
+def get_customer(db: Session, pk: int):
+    stmt = select(Customer).where(Customer.id == pk)
+    result = db.scalars(stmt).one()
+    return result
+
+
 def get_order(db: Session, id: int):
     stmt = select(Order).where(Order.id == id)
     result = db.scalars(stmt).one()
