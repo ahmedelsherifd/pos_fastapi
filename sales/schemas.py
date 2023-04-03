@@ -11,6 +11,20 @@ class CustomerInput(BaseModel):
     name: str
 
 
+class CategoryInput(BaseModel):
+    ...
+
+
+class ProductVariantInput(BaseModel):
+    name: str
+    price: Decimal
+
+
+class ProductInput(BaseModel):
+    name: str
+    variants: list[ProductVariantInput]
+
+
 class PaymentInput(BaseModel):
     amount: Decimal
 

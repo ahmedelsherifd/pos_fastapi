@@ -49,3 +49,9 @@ def create_customer(data: schemas.CustomerInput,
                     db: Session = Depends(get_db)):
     instance = crud.create_customer(db, **data.dict())
     return instance
+
+
+@app.post("/products/", response_model=schemas.Product)
+def create_customer(data: schemas.ProductInput, db: Session = Depends(get_db)):
+    instance = crud.create_product(db, **data.dict())
+    return instance

@@ -22,3 +22,16 @@ def test_create_order(db, client: TestClient):
 def test_create_customer(db, client: TestClient):
     response = client.post("/customers/", json={"name": "Ahmed ELsherif"})
     assert response.status_code == 200
+
+
+def test_create_product(db, client: TestClient):
+    response = client.post("/products/",
+                           json={
+                               "name":
+                               "Iphone 6",
+                               "variants": [{
+                                   "price": 10,
+                                   "name": "Iphone 6 128GB",
+                               }]
+                           })
+    assert response.status_code == 200
