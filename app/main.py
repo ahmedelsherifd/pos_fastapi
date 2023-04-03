@@ -31,7 +31,7 @@ def get_db():
         db.close()
 
 
-@app.get("/variants/")
+@app.get("/variants/", response_model=list[schemas.ProductVariant])
 def get_variants(db: Session = Depends(get_db)):
     variants = crud.get_variants(db)
     return variants
