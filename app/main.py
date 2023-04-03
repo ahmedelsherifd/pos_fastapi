@@ -31,12 +31,6 @@ def get_db():
         db.close()
 
 
-@app.get("/variants/", response_model=list[schemas.ProductVariant])
-def get_variants(db: Session = Depends(get_db)):
-    variants = crud.get_variants(db)
-    return variants
-
-
 @app.post("/orders/", response_model=schemas.Order)
 def create_order(data: schemas.OrderInput, db: Session = Depends(get_db)):
 
@@ -62,3 +56,21 @@ def create_customer(data: schemas.CategoryInput,
                     db: Session = Depends(get_db)):
     instance = crud.create_category(db, **data.dict())
     return instance
+
+
+@app.get("/variants/", response_model=list[schemas.ProductVariant])
+def get_variants(db: Session = Depends(get_db)):
+    data = crud.get_variants(db)
+    return data
+
+
+@app.get("/categories/", response_model=list[schemas.Category])
+def get_variants(db: Session = Depends(get_db)):
+    data = crud.get_categories(db)
+    return data
+
+
+@app.get("/customers/", response_model=list[schemas.Customer])
+def get_customers(db: Session = Depends(get_db)):
+    data = crud.get_customers(db)
+    return data

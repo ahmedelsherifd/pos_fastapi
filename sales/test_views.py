@@ -45,3 +45,13 @@ def test_create_category(db, client: TestClient):
 def test_get_product_variants(db, client: TestClient):
     response = client.get("/variants/")
     assert response.status_code == 200
+
+
+def test_get_categories(db, client: TestClient):
+    response = client.get("/categories/")
+    assert response.status_code == 200
+
+
+def test_get_customers(db, client: TestClient):
+    response = client.get("/customers/")
+    assert response.status_code == 200
