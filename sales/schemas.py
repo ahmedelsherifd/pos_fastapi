@@ -80,7 +80,7 @@ class Product(BaseModel):
 
 
 class SaleByItem(BaseModel):
-    date: str
+    ProductVariant: ProductVariant
     total_sales: Decimal
     total_quantity: int
 
