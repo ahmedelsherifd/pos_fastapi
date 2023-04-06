@@ -135,3 +135,18 @@ def test_create_user(db):
         "password": "642@A531"
     }
     crud.create_user(db, **data)
+
+
+def test_authenticate_user(db):
+    data = {
+        "username": "gleader21",
+        "email": "gleader21@gmail.com",
+        "password": "642@A531"
+    }
+    crud.create_user(db, **data)
+
+    user = crud.authenticate_user(db,
+                                  username="gleader21",
+                                  password="642@A531")
+
+    assert user is not None

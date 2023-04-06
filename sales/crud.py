@@ -163,7 +163,9 @@ def get_total_payments(db: Session,
 
 
 def authenticate_user(db: Session, username: str, password: str):
-    return None
+    stmt = select(User).where(username == username, password == password)
+    result = db.scalar(stmt)
+    return result
 
 
 def create_user(db: Session, **data):
