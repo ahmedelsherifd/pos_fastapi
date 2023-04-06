@@ -94,3 +94,24 @@ def test_total_payments_node(db, client: TestClient):
     load_data(db)
     response = client.get("/total-payments/node/")
     assert response.status_code == 200
+
+
+# def test_login(db, client: TestClient):
+#     response = client.post("/token/",
+#                            data={
+#                                "username": "leader",
+#                                "password": "642*A531"
+#                            })
+#     assert response.status_code == 401
+
+#     client.post("/user/", {"username": "", "email": "", "password": ""})
+
+#     response = client.post("/token/",
+#                            json={
+#                                "username": "leader",
+#                                "password": "642*A531"
+#                            })
+
+#     assert response.status_code == 200
+#     assert "access_token" in response.json()
+#     assert "token_type" in response.json()

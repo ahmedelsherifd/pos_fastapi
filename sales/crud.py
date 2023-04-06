@@ -1,4 +1,5 @@
-from .models import Customer, Product, ProductVariant, OrderItem, Order, Payement, Category
+from .models import Customer, Product, ProductVariant, OrderItem, Order, Payement, Category, User
+
 from sqlalchemy.orm import Session
 from sqlalchemy import select, func
 from sqlalchemy.orm import joinedload
@@ -159,3 +160,14 @@ def get_total_payments(db: Session,
     result = db.execute(stmt).all()
 
     return result
+
+
+def authenticate_user(db: Session, username: str, password: str):
+    return None
+
+
+def create_user(db: Session, **data):
+    user = User(**data)
+    db.add(user)
+    db.commit()
+    return user

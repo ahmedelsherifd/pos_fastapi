@@ -109,3 +109,12 @@ class OrderItem(Base):
                                           server_default=func.now())
     product: Mapped["ProductVariant"] = relationship(back_populates="orders")
     order: Mapped["Order"] = relationship(back_populates="items")
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    username: Mapped[str] = mapped_column(unique=True, index=True)
+    email: Mapped[str] = mapped_column(unique=True, index=True)
+    password: Mapped[str] = mapped_column()

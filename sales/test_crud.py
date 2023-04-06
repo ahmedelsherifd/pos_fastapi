@@ -6,6 +6,7 @@ from .crud import (create_category, create_customer, create_order,
                    get_sales_by_items, get_variants, get_total_payments_node,
                    get_total_payments, get_categories)
 
+from . import crud
 from datetime import datetime
 from .somedata import load_data
 
@@ -125,3 +126,12 @@ def test_total_payments_daily(db):
     assert mar_28.date == "2023-03-28"
     assert mar_28.total_payments == 100
     assert mar_29.total_payments == 20
+
+
+def test_create_user(db):
+    data = {
+        "username": "gleader21",
+        "email": "gleader21@gmail.com",
+        "password": "642@A531"
+    }
+    crud.create_user(db, **data)
