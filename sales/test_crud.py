@@ -177,3 +177,8 @@ def test_get_user(db):
 def test_get_user_with_user_dosnot_exist(db):
     create_user_1(db)
     assert not crud.get_user(db, 2)
+
+
+def test_password_is_hashed(db):
+    user = create_user_1(db)
+    assert crud.get_user(db, 1).password != "642@A531"
