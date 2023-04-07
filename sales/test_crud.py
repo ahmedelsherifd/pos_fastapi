@@ -129,24 +129,51 @@ def test_total_payments_daily(db):
 
 
 def test_create_user(db):
+    assert not crud.get_users(db)
+
     data = {
         "username": "gleader21",
         "email": "gleader21@gmail.com",
         "password": "642@A531"
     }
     crud.create_user(db, **data)
+
+    assert crud.get_users(db)[0]
+
+
+def create_user_1(db):
+    data = {
+        "username": "gleader21",
+        "email": "gleader21@gmail.com",
+        "password": "642@A531"
+    }
+    user = crud.create_user(db, **data)
+    return user
 
 
 def test_authenticate_user(db):
-    data = {
-        "username": "gleader21",
-        "email": "gleader21@gmail.com",
-        "password": "642@A531"
-    }
-    crud.create_user(db, **data)
-
+    create_user_1(db)
     user = crud.authenticate_user(db,
                                   username="gleader21",
                                   password="642@A531")
 
-    assert user is not None
+    assert user.id
+
+
+def test_authenticate_user_dosnot_exits(db):
+    user = crud.authenticate_user(db,
+                                  username="gleader21",
+                                  password="642@A531")
+
+    assert not user
+
+
+def test_get_user(db):
+    create_user_1(db)
+
+    assert crud.get_user(db, 1)
+
+
+def test_get_user_with_user_dosnot_exist(db):
+    create_user_1(db)
+    assert not crud.get_user(db, 2)

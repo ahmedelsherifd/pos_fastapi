@@ -173,3 +173,15 @@ def create_user(db: Session, **data):
     db.add(user)
     db.commit()
     return user
+
+
+def get_users(db: Session):
+    stmt = select(User)
+    result = db.scalars(stmt).all()
+    return result
+
+
+def get_user(db: Session, pk):
+    stmt = select(User).where(User.id == pk)
+    result = db.scalar(stmt)
+    return result
