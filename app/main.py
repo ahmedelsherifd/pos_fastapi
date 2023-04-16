@@ -13,14 +13,8 @@ from datetime import datetime, timedelta
 from . import models
 from .database import SessionLocal, engine
 from decimal import Decimal
-
-middleware = [
-    Middleware(RawContextMiddleware,
-               plugins=(plugins.RequestIdPlugin(),
-                        plugins.CorrelationIdPlugin()))
-]
-
-app = FastAPI(middleware=middleware)
+from fastapi.routing import APIRoute
+from fastapi.openapi.utils import get_openapi
 
 SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
 ALGORITHM = "HS256"
@@ -44,88 +38,141 @@ def get_db():
         db.close()
 
 
-@app.post("/orders/", response_model=schemas.Order)
+def custom_generate_unique_id(route: APIRoute):
+    return f"{route.tags[0]}-{route.name}"
+
+
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+    openapi_schema = get_openapi(
+        title="Custom title",
+        version="2.5.0",
+        description="This is a very custom OpenAPI schema",
+        routes=app.routes,
+    )
+    for path_data in openapi_schema["paths"].values():
+        for operation in path_data.values():
+            tag = operation["tags"][0]
+            operation_id = operation["operationId"]
+            to_remove = f"{tag}-"
+            new_operation_id = operation_id[len(to_remove):]
+            operation["operationId"] = new_operation_id
+
+    openapi_schema["info"]["x-logo"] = {
+        "url": "https://fastapi.tiangolo.com/img/logo-margin/logo-teal.png"
+    }
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+
+middleware = [
+    Middleware(RawContextMiddleware,
+               plugins=(plugins.RequestIdPlugin(),
+                        plugins.CorrelationIdPlugin()))
+]
+
+app = FastAPI(middleware=middleware,
+              generate_unique_id_function=custom_generate_unique_id)
+app.openapi = custom_openapi
+
+
+@app.post("/orders/", response_model=schemas.Order, tags=["orders"])
 def create_order(data: schemas.OrderInput, db: Session = Depends(get_db)):
 
     instance = crud.create_order(db, **data.dict())
     return instance
 
 
-@app.post("/customers/", response_model=schemas.Customer)
+@app.post("/customers/", response_model=schemas.Customer, tags=["customers"])
 def create_customer(data: schemas.CustomerInput,
                     db: Session = Depends(get_db)):
     instance = crud.create_customer(db, **data.dict())
     return instance
 
 
-@app.post("/products/", response_model=schemas.Product)
-def create_customer(data: schemas.ProductInput, db: Session = Depends(get_db)):
+@app.post("/products/", response_model=schemas.Product, tags=["products"])
+def create_product(data: schemas.ProductInput, db: Session = Depends(get_db)):
     instance = crud.create_product(db, **data.dict())
     return instance
 
 
-@app.post("/categories/", response_model=schemas.Category)
-def create_customer(data: schemas.CategoryInput,
+@app.post("/categories/", response_model=schemas.Category, tags=["categories"])
+def create_category(data: schemas.CategoryInput,
                     db: Session = Depends(get_db)):
     instance = crud.create_category(db, **data.dict())
     return instance
 
 
-@app.get("/variants/", response_model=list[schemas.ProductVariant])
+@app.get("/variants/",
+         response_model=list[schemas.ProductVariant],
+         tags=["variants"])
 def get_variants(db: Session = Depends(get_db)):
     data = crud.get_variants(db)
     return data
 
 
-@app.get("/categories/", response_model=list[schemas.Category])
+@app.get("/categories/",
+         response_model=list[schemas.Category],
+         tags=["categories"])
 def get_variants(db: Session = Depends(get_db)):
     data = crud.get_categories(db)
     return data
 
 
-@app.get("/customers/", response_model=list[schemas.Customer])
+@app.get("/customers/",
+         response_model=list[schemas.Customer],
+         tags=["customers"])
 def get_customers(db: Session = Depends(get_db)):
     data = crud.get_customers(db)
     return data
 
 
-@app.get("/sales-by-items/", response_model=list[schemas.SaleByItem])
+@app.get("/sales-by-items/",
+         response_model=list[schemas.SaleByItem],
+         tags=["sales-reports"])
 def get_sales_by_items(db: Session = Depends(get_db)):
     data = crud.get_sales_by_items(db)
     return data
 
 
-@app.get("/total-payments/", response_model=list[schemas.TotalPayment])
+@app.get("/total-payments/",
+         response_model=list[schemas.TotalPayment],
+         tags=["sales-reports"])
 def get_total_payments(db: Session = Depends(get_db)):
     data = crud.get_total_payments(db)
     return data
 
 
-@app.get("/products/{pk}/", response_model=schemas.Product)
+@app.get("/products/{pk}/", response_model=schemas.Product, tags=["products"])
 def get_product(pk: int, db: Session = Depends(get_db)):
     instance = get_object_or_404(db, crud.get_product, pk)
     return instance
 
 
-@app.get("/customers/{pk}/", response_model=schemas.Customer)
+@app.get("/customers/{pk}/",
+         response_model=schemas.Customer,
+         tags=["customers"])
 def get_customer(pk: int, db: Session = Depends(get_db)):
     instance = get_object_or_404(db, crud.get_customer, pk)
     return instance
 
 
-@app.get("/orders/{pk}/", response_model=schemas.Order)
+@app.get("/orders/{pk}/", response_model=schemas.Order, tags=["orders"])
 def get_order(pk: int, db: Session = Depends(get_db)):
     instance = get_object_or_404(db, crud.get_order, pk)
     return instance
 
 
-@app.get("/total-payments/node/", response_model=Decimal)
+@app.get("/total-payments/node/",
+         response_model=Decimal,
+         tags=["sales-reports"])
 def get_total_payments_node(db: Session = Depends(get_db)):
     instance = crud.get_total_payments_node(db)
     return instance
 
 
-@app.post("/token/", response_model=schemas.Token)
+@app.post("/token/", response_model=schemas.Token, tags=["token"])
 def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm,
                          Depends()],
