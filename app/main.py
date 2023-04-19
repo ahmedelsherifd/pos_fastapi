@@ -15,6 +15,7 @@ from .database import SessionLocal, engine
 from decimal import Decimal
 from fastapi.routing import APIRoute
 from fastapi.openapi.utils import get_openapi
+from jose import JWTError, jwt
 
 SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
 ALGORITHM = "HS256"
@@ -39,31 +40,7 @@ def get_db():
 
 
 def custom_generate_unique_id(route: APIRoute):
-    return f"{route.tags[0]}-{route.name}"
-
-
-def custom_openapi():
-    if app.openapi_schema:
-        return app.openapi_schema
-    openapi_schema = get_openapi(
-        title="Custom title",
-        version="2.5.0",
-        description="This is a very custom OpenAPI schema",
-        routes=app.routes,
-    )
-    for path_data in openapi_schema["paths"].values():
-        for operation in path_data.values():
-            tag = operation["tags"][0]
-            operation_id = operation["operationId"]
-            to_remove = f"{tag}-"
-            new_operation_id = operation_id[len(to_remove):]
-            operation["operationId"] = new_operation_id
-
-    openapi_schema["info"]["x-logo"] = {
-        "url": "https://fastapi.tiangolo.com/img/logo-margin/logo-teal.png"
-    }
-    app.openapi_schema = openapi_schema
-    return app.openapi_schema
+    return f"{route.name}"
 
 
 middleware = [
@@ -74,7 +51,7 @@ middleware = [
 
 app = FastAPI(middleware=middleware,
               generate_unique_id_function=custom_generate_unique_id)
-app.openapi = custom_openapi
+# app.openapi = custom_openapi
 
 
 @app.post("/orders/", response_model=schemas.Order, tags=["orders"])
@@ -173,12 +150,9 @@ def get_total_payments_node(db: Session = Depends(get_db)):
 
 
 @app.post("/token/", response_model=schemas.Token, tags=["token"])
-def login_for_access_token(
-    form_data: Annotated[OAuth2PasswordRequestForm,
-                         Depends()],
-    db: Session = Depends(get_db)
-) -> schemas.Token:
-
+def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm,
+                                                Depends()],
+                           db: Session = Depends(get_db)):
     user = crud.authenticate_user(db,
                                   username=form_data.username,
                                   password=form_data.password)
@@ -190,7 +164,18 @@ def login_for_access_token(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    # access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    # access_token = create_access_token(data={"sub": user.username},
-    #                                    expires_delta=access_token_expires)
-    return {"access_token": "jabgfaegfk", "token_type": "bearer"}
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(data={"sub": user.username},
+                                       expires_delta=access_token_expires)
+    return {"access_token": access_token, "token_type": "bearer"}
+
+
+def create_access_token(data: dict, expires_delta: timedelta | None = None):
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.utcnow() + expires_delta
+    else:
+        expire = datetime.utcnow() + timedelta(minutes=15)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt

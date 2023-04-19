@@ -5,6 +5,8 @@ from sqlalchemy.orm import Session
 from .crud import (create_category, create_customer, create_product,
                    get_categories, get_variants, create_order)
 
+from . import crud
+
 
 def create_customer_1(db):
     data = {"name": "Khalaf Eldahsoury Khalaf"}
@@ -95,6 +97,15 @@ def create_order_2(db):
     create_order(db, **data)
 
 
+def create_user_1(db):
+    data = {
+        "username": "leader",
+        "email": "gleader21@gmail.com",
+        "password": "642*A531"
+    }
+    crud.create_user(db, **data)
+
+
 def load_data(db: Session):
     create_customer_1(db)
     create_customer_2(db)
@@ -108,6 +119,7 @@ def load_data(db: Session):
     create_order_1(db)
     create_order_2(db)
 
+    create_user_1(db)
     # don't use product_2 used in test_sales_by_items - order
     # don't use mar_29 as created_at in order.items used in test_sales_by_items - order
     # don't use mar_29 or mar_28 used in test_total_payments - payment
