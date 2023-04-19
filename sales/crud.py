@@ -175,7 +175,7 @@ def get_password_hash(password):
 
 
 def authenticate_user(db: Session, username: str, password: str):
-    stmt = select(User).where(username == username)
+    stmt = select(User).where(User.username == username)
     user = db.scalar(stmt)
     if not user:
         return None
@@ -201,5 +201,11 @@ def get_users(db: Session):
 
 def get_user(db: Session, pk):
     stmt = select(User).where(User.id == pk)
+    result = db.scalar(stmt)
+    return result
+
+
+def get_user_by_username(db: Session, username: str):
+    stmt = select(User).where(User.username == username)
     result = db.scalar(stmt)
     return result

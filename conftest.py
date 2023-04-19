@@ -3,10 +3,23 @@ from os import environ
 import pytest
 from fastapi.testclient import TestClient
 from starlette_context import context
-
+from sqlalchemy.orm import Session
 from app.main import app, get_db
+from sales.crud import create_user
 
 environ["TESTING"] = str(True)
+
+
+def admin_headers(db: Session, client: TestClient):
+    data = {
+        "username": "admin",
+        "password": "A*457951",
+    }
+    create_user(db, **data, email="admin@gmail.com")
+    response = client.post("/token/", data=data)
+    access_token = response.json()["access_token"]
+    headers = {"Authorization": f"Bearer {access_token}"}
+    return headers
 
 
 @pytest.fixture
@@ -49,6 +62,7 @@ def client(db):
             db.close()
 
     app.dependency_overrides[get_db] = overid_get_db
-
+    # headers = admin_headers(db, TestClient(app))
     with TestClient(app) as c:
+        c.headers = admin_headers(db, c)
         yield c
