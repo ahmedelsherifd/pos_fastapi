@@ -7,6 +7,8 @@ from sales.crud import (create_category, create_customer, create_product,
 
 from app.database import SessionLocal
 
+from . import crud
+
 
 def create_customer_1(db):
     data = {"name": "Khalaf Eldahsoury Khalaf"}
@@ -71,10 +73,20 @@ def create_product_3(db):
     create_product(db, **data)
 
 
+def create_user_1(db):
+    data = {
+        "username": "leader",
+        "email": "gleader21@gmail.com",
+        "password": "642*A531"
+    }
+    crud.create_user(db, **data)
+
+
 def main():
     db = SessionLocal()
-    # create_category_1(db)
-    # create_category_2(db)
-    #create_product_1(db)
-    # create_product_2(db)
-    # create_product_3(db)
+    create_category_1(db)
+    create_category_2(db)
+    create_product_1(db)
+    create_product_2(db)
+    create_product_3(db)
+    create_user_1(db)

@@ -4,13 +4,13 @@ import pytest
 from fastapi.testclient import TestClient
 from starlette_context import context
 from sqlalchemy.orm import Session
-from app.main import app, get_db
-from sales.crud import create_user
 
 environ["TESTING"] = str(True)
 
 
 def admin_headers(db: Session, client: TestClient):
+    from sales.crud import create_user
+
     data = {
         "username": "admin",
         "password": "A*457951",
@@ -53,6 +53,7 @@ def database_setup(request):
 
 @pytest.fixture()
 def client(db):
+    from app.main import app, get_db
 
     def overid_get_db():
         try:
